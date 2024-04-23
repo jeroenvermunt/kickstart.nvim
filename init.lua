@@ -62,6 +62,9 @@ vim.opt.showmode = false
 --  See `:help 'clipboard'`
 vim.opt.clipboard = 'unnamedplus'
 
+-- possible: custom keymap for unnamedplus + clipboard
+--
+
 -- Enable break indent
 
 -- Save undo history
@@ -98,7 +101,8 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 20 -- for smaller screens
+-- vim.opt.scrolloff = 20
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -124,15 +128,6 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
--- Keybinds to make split navigation easier.
---  Use CTRL+<hjkl> to switch between windows
---
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -163,6 +158,7 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy
 --
 --  You can press `?` in this menu for help. Use `:q` to close the window
+-- keymap.set('n', '<leader>wv', '<C-w>v') -- split window vertically
 --
 --  To update plugins you can run
 --    :Lazy update
@@ -174,20 +170,32 @@ require('lazy').setup({
   'ThePrimeagen/vim-be-good',
   'WhoIsSethDaniel/toggle-lsp-diagnostics.nvim',
   'nvim-lua/plenary.nvim',
+  'tpope/vim-fugitive', -- Used for git completion
   {
     -- https://github.com/ThePrimeagen/harpoon
     'ThePrimeagen/harpoon',
+    -- branch = 'harpoon2',
     branch = 'master',
     event = 'VeryLazy',
     dependencies = {
       -- https://github.com/nvim-lua/plenary.nvim
       'nvim-lua/plenary.nvim',
+
+      -- {
+      --  'nkakouros-original/scrollofffraction',
+      --  config = function()
+      --    require('scrollofffraction').setup({
+      --            "scroj
+      --            scro
+      --          })
+      --  end
+      -- },
     },
-    opts = {
-      menu = {
-        width = 120,
-      },
-    },
+    -- opts = {
+    --   menu = {
+    --     width = 120,
+    --   },
+    -- },
   },
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -333,14 +341,29 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<C-sf>', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<C-p>', builtin.git_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+      -- vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+
+      -- vim.keymap.set('n', '<leader>sws', function()
+      --     local word = vim.fn.expand('<cword>')
+      --     builtin.grep_string({ search = word })
+      --   end, { desc = '[P]review [W]ord [S]earch' })
+
+      vim.keymap.set('n', '<leader>sW', function()
+        local word = vim.fn.expand '<cWORD>'
+        builtin.grep_string { search = word }
+      end, { desc = '[S]earch expanded [W]' })
+
+      vim.keymap.set('n', '<leader>sg', function()
+        builtin.grep_string { search = vim.fn.input 'Grep > ' }
+      end, { desc = '[S]earch by grep' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -646,7 +669,6 @@ require('lazy').setup({
       },
       'saadparwaiz1/cmp_luasnip',
 
-      'tpope/vim-fugitive', -- Used for git completion
       -- Adds other completion capabilities.
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
@@ -825,7 +847,7 @@ require('lazy').setup({
   require 'kickstart.plugins.debug',
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
@@ -863,11 +885,14 @@ require('toggle_lsp_diagnostics').init()
 -- vim.diagnostic.config { ...some config... }
 require('toggle_lsp_diagnostics').init(vim.diagnostic.config())
 
-require('telescope').load_extension 'projects'
+-- require('telescope').load_extension 'projects'
 -- require('telescope').extensions.projects.projects()
-require('toggle_lsp_diagnostics').init { start_on = false }
+require('toggle_lsp_diagnostics').init { start_on = true }
 
 -- lua
+require('nvim-autopairs').remove_rule "'"
+require('nvim-autopairs').remove_rule '"'
+
 require('nvim-tree').setup {
   sync_root_with_cwd = true,
   respect_buf_cwd = true,
@@ -876,6 +901,17 @@ require('nvim-tree').setup {
     update_root = true,
   },
 }
+
+local function system(command)
+  local file = assert(io.popen(command, 'r'))
+  local output = file:read('*all'):gsub('%s+', '')
+  file:close()
+  return output
+end
+
+if vim.fn.executable 'python3' > 0 then
+  vim.g.python3_host_prog = system 'which python3'
+end
 
 -- vim.cmd.colorscheme 'catppuccin'
 -- -- The line beneath this is called `modeline`. See `:help modeline`

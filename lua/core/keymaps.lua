@@ -11,16 +11,33 @@ keymap.set('n', '<leader>qq', ':q!<CR>') -- quit without saving
 keymap.set('n', '<leader>ww', ':w<CR>') -- save
 keymap.set('n', 'gx', ':!open <c-r><c-a><CR>') -- open URL under cursor
 
+-- general QoL
+keymap.set('i', 'LK', '<ESC>/[]|)]<Enter><cmd>nohlsearch<CR>a') --  escape brackets
+keymap.set('x', '<leader>p', '"_dP') -- paste without yanking
+keymap.set('n', '<leader>p', '"+P') -- paste from system clipboard
+keymap.set('n', '<leader>y', '*y') -- yank to system clipboard
+-- keymap.set('i', '<C-h>', '<home>') -- move to beginning of line
+-- keymap.set('i', '<C-l>', '<END>') -- move to end of line
+-- keymap.set('i', '<C-b>', '<ESC>$a:<ESC>jo') -- move to beginning of line
+
+-- Python QoL
+keymap.set('i', 'VJ', '<ESC>/[]|)]<Enter><cmd>nohlsearch<CR>a:<Enter>') -- move to beginning of line
+keymap.set('i', '<C-s>m', "if __name__ == '__main__':<Enter><Enter>") -- move to end of line
+keymap.set('i', '<C-s>c', '<ESC>$a:<Enter><Enter>def __init__()<C-o>i') -- move to end of line
+
+-- Quickfix short
+keymap.set('n', '<C-j>', ':cnext<CR>') -- move to next quickfix
+keymap.set('n', '<C-k>', ':cprev<CR>') -- move to previous quickfix
+
 -- Split window management
--- keymap.set('n', '<leader>wv', '<C-w>v') -- split window vertically
 keymap.set('n', '<C-\\>', '<C-w>v') -- split window vertically
--- keymap.set('n', '<leader>wh', '<C-w>s') -- split window horizontally
--- keymap.set('n', '<leader>we', '<C-w>=') -- make split windows equal width
--- keymap.set('n', '<leader>wx', ':close<CR>') -- close split window
--- keymap.set('n', '<leader>wj', '<C-w>-') -- make split window height shorter
--- keymap.set('n', '<leader>wk', '<C-w>+') -- make split windows height taller
--- keymap.set('n', '<leader>wl', '<C-w>>5') -- make split windows width bigger
--- keymap.set('n', '<leader>wh', '<C-w><5') -- make split windows width smaller
+
+---- Keybinds to make split navigation easier.
+----  See `:help wincmd` for a list of all window commands
+--vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+--vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+--vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+--vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Tab management
 keymap.set('n', '<leader>to', ':tabnew<CR>') -- open a new tab
@@ -52,7 +69,9 @@ keymap.set('n', '<leader>er', ':NvimTreeFocus<CR>') -- toggle focus to file expl
 keymap.set('n', '<leader>ef', ':NvimTreeFindFile<CR>') -- find file in file explorer
 
 -- recent projects
-keymap.set('n', '<leader>pp', ':Telescope projects<CR>')
+keymap.set('n', '<leader>ap', ':Telescope neovim-project history<CR>', { desc = 'Open recent project' })
+keymap.set('n', '<leader>ad', ':Telescope neovim-project discover<CR>', { desc = 'Discover projects' })
+keymap.set('n', '<leader>ar', ':NeovimProjectLoadRecent<CR>', { desc = 'Load recent project' })
 
 -- Toggle diagnostics
 keymap.set('n', '<leader>td', ':ToggleDiag<CR>')
@@ -72,36 +91,88 @@ keymap.set('n', '<leader>td', ':ToggleDiag<CR>')
 -- Git-blame
 keymap.set('n', '<leader>gb', ':GitBlameToggle<CR>') -- toggle git blame
 
+-- Open git menu
+keymap.set('n', '<leader>gm', ':Git<CR>')
+
 -- Harpoon
-keymap.set('n', '<leader>ha', require('harpoon.mark').add_file)
-keymap.set('n', '<leader>hh', require('harpoon.ui').toggle_quick_menu)
+keymap.set('n', '<leader>ha', require('harpoon.mark').add_file, { desc = 'Add file to harpoon' })
+keymap.set('n', '<leader>hh', require('harpoon.ui').toggle_quick_menu, { desc = 'Toggle harpoon menu' })
+
+keymap.set('n', '<leader>ht', function()
+  require('harpoon.term').gotoTerminal(1)
+end, { desc = 'Go to terminal' })
+-- Harpoon
+
+-- keymap.set('n', '<leader>ht', function()
+--   require('harpoon.term').gotoTerminal(1)
+-- end, { desc = 'Go to terminal' })
+
+-- local harpoon = require 'harpoon'
+
+-- harpoon:setup()
+
+-- keymap.set('n', '<leader>ha', function()
+--   harpoon:list():add()
+-- end)
+-- keymap.set('n', '<leader>hh', function()
+--   harpoon.ui:toggle_quick_menu(harpoon:list())
+-- end)
+
+-- keymap.set('n', '<leader>h1', function()
+--   harpoon:list():select(1)
+-- end, { desc = 'Harpoon file 1' })
+-- keymap.set('n', '<leader>h2', function()
+--   harpoon:list():select(2)
+-- end, { desc = 'Harpoon file 2' })
+-- keymap.set('n', '<leader>h3', function()
+--   harpoon:list():select(3)
+-- end, { desc = 'Harpoon file 3' })
+-- keymap.set('n', '<leader>h4', function()
+--   harpoon:list():select(4)
+-- end, { desc = 'Harpoon file 4' })
+-- keymap.set('n', '<leader>h5', function()
+--   harpoon:list():select(5)
+-- end, { desc = 'Harpoon file 5' })
+-- keymap.set('n', '<leader>h6', function()
+--   harpoon:list():select(6)
+-- end, { desc = 'Harpoon file 6' })
+-- keymap.set('n', '<leader>h7', function()
+--   harpoon:list():select(7)
+-- end, { desc = 'Harpoon file 7' })
+-- keymap.set('n', '<leader>h8', function()
+--   harpoon:list():select(8)
+-- end, { desc = 'Harpoon file 8' })
+-- keymap.set('n', '<leader>h9', function()
+--   harpoon:list():select(9)
+-- end, { desc = 'Harpoon file 9' })
+
 keymap.set('n', '<leader>h1', function()
   require('harpoon.ui').nav_file(1)
-end)
+end, { desc = 'Navigate to harpoon file 1' })
 keymap.set('n', '<leader>h2', function()
   require('harpoon.ui').nav_file(2)
-end)
+end, { desc = 'navigate to harpoon file 2' })
 keymap.set('n', '<leader>h3', function()
   require('harpoon.ui').nav_file(3)
-end)
+end, { desc = 'navigate to harpoon file 3' })
 keymap.set('n', '<leader>h4', function()
   require('harpoon.ui').nav_file(4)
-end)
+end, { desc = 'navigate to harpoon file 4' })
 keymap.set('n', '<leader>h5', function()
   require('harpoon.ui').nav_file(5)
-end)
+end, { desc = 'navigate to harpoon file 5' })
 keymap.set('n', '<leader>h6', function()
   require('harpoon.ui').nav_file(6)
-end)
+end, { desc = 'navigate to harpoon file 6' })
 keymap.set('n', '<leader>h7', function()
   require('harpoon.ui').nav_file(7)
-end)
+end, { desc = 'navigate to harpoon file 7' })
 keymap.set('n', '<leader>h8', function()
   require('harpoon.ui').nav_file(8)
-end)
+end, { desc = 'navigate to harpoon file 8' })
 keymap.set('n', '<leader>h9', function()
   require('harpoon.ui').nav_file(9)
-end)
+end, { desc = 'navigate to harpoon file 9' })
 
 -- Vim REST Console
 keymap.set('n', '<leader>xr', ':call VrcQuery()<CR>') -- Run REST query
