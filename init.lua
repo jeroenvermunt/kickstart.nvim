@@ -174,22 +174,12 @@ require('lazy').setup({
   {
     -- https://github.com/ThePrimeagen/harpoon
     'ThePrimeagen/harpoon',
-    -- branch = 'harpoon2',
-    branch = 'master',
+    branch = 'harpoon2',
+    -- branch = 'master',
     event = 'VeryLazy',
     dependencies = {
       -- https://github.com/nvim-lua/plenary.nvim
       'nvim-lua/plenary.nvim',
-
-      -- {
-      --  'nkakouros-original/scrollofffraction',
-      --  config = function()
-      --    require('scrollofffraction').setup({
-      --            "scroj
-      --            scro
-      --          })
-      --  end
-      -- },
     },
     -- opts = {
     --   menu = {
@@ -197,6 +187,19 @@ require('lazy').setup({
     --   },
     -- },
   },
+
+  {
+    'nkakouros-original/scrollofffraction.nvim',
+    -- branch = 'master',
+    config = function()
+      require('scrollofffraction').setup {
+        scrolloff_fraction = 0.3,
+        scrolloff_absolute_filetypes = { 'qf', 'markdown' },
+        scrolloff_absolute_value = 5,
+      }
+    end,
+  },
+
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
@@ -254,7 +257,7 @@ require('lazy').setup({
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+        -- ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
       }
       -- visual mode
       require('which-key').register({
@@ -341,7 +344,7 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<C-sf>', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<C-p>', builtin.git_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
@@ -579,11 +582,12 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'pyright',
-        'black',
+        -- 'black',
         'mypy',
         'flake8',
-        'pylint',
-        'isort',
+        -- 'pylint',
+        -- 'isort',
+        'ruff',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -774,6 +778,7 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [']quote
       --  - ci'  - [C]hange [I]nside [']quote
+      -- test with `v` or `c` in normal mode
       require('mini.ai').setup { n_lines = 500 }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
@@ -783,24 +788,19 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
-
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
+  },
+
+  {
+    -- 'rebelot/heirline.nvim',
+    -- You can optionally lazy-load heirline on UiEnter
+    -- to make sure all required plugins and colorschemes are loaded before setup
+    -- event = "UiEnter",
+    -- config = function()
+    --     require("heirline").setup({...})
+    -- end
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -889,9 +889,9 @@ require('toggle_lsp_diagnostics').init(vim.diagnostic.config())
 -- require('telescope').extensions.projects.projects()
 require('toggle_lsp_diagnostics').init { start_on = true }
 
--- lua
-require('nvim-autopairs').remove_rule "'"
-require('nvim-autopairs').remove_rule '"'
+-- -- lua
+-- require('nvim-autopairs').remove_rule "'"
+-- require('nvim-autopairs').remove_rule '"'
 
 require('nvim-tree').setup {
   sync_root_with_cwd = true,
@@ -916,3 +916,34 @@ end
 -- vim.cmd.colorscheme 'catppuccin'
 -- -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
+--
+require('venv-selector').setup {
+  anaconda_base_path = '/home/jeroen/anaconda3',
+  anaconda_envs_path = '/home/jeroen/anaconda3/envs',
+}
+
+-- local venv = {
+--   {
+--     provider = function()
+--       return '  ' .. actived_venv()
+--     end,
+--   },
+--   on_click = {
+--     callback = function()
+--       vim.cmd.VenvSelect()
+--     end,
+--     name = 'heirline_statusline_venv_selector',
+--   },
+-- }
+
+-- function MagmaInitPython()
+--   vim.cmd [[
+--     :MagmaInit python3
+--     :MagmaEvaluateArgument a=5
+--     ]]
+-- end
+
+-- vim.cmd [[
+-- :command MagmaInitPython lua MagmaInitPython()
+-- ]]
